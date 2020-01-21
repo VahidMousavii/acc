@@ -17,7 +17,7 @@ import javax.ws.rs.QueryParam;
 import java.util.List;
 
 @Path("/user_accounting")
-public class AccountingC {
+public class AccountC {
 
     @Autowired
     AccountRepository accountRepository;
@@ -30,7 +30,7 @@ public class AccountingC {
     @GET
     @Produces(Phrases.text_html)
     public String getAllAccount() {
-        List<Account> accounts = accountRepository.findAll();
+        List<com.av.accounting.entity.Account> accounts = accountRepository.findAll();
         Gson gson = new Gson();
         String jj = gson.toJson(accounts);
         return jj;
@@ -38,7 +38,7 @@ public class AccountingC {
 
 
     public String addAccount(@NotNull @QueryParam("cardNumber") String cardNumber, @NotNull @QueryParam("CVV2") String CVV2, @NotNull @QueryParam("expiryDate") String exp, @QueryParam("createDate") String createDate) {
-        Account account = new Account();
+        com.av.accounting.entity.Account account = new com.av.accounting.entity.Account();
         String checkAccount = accountValidate.checkAccount(account);
         if (!checkAccount.equals(Phrases.success)) {
             return checkAccount;
