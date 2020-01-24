@@ -71,7 +71,7 @@ class AccountingApplicationTests {
         }*/
 
     }
-    @Test
+   /* @Test
     void addUser() {
         User user = new User();
         user.setID(1L);
@@ -92,7 +92,8 @@ class AccountingApplicationTests {
             System.out.println(account.getCardNumber());
         }
 
-    }
+    }*/
+
 
 }
 

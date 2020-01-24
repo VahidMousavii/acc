@@ -3,44 +3,52 @@ package com.av.accounting.controller;
 import com.av.accounting.entity.User;
 import com.av.accounting.repositories.UserRepository;
 import com.av.accounting.validation.UserValidate;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import com.av.accounting.validation.Phrases;
-import com.av.accounting.validation.UserValidateimpl;
+import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+
 import java.util.List;
 
-@Path("/user")
-public class UserC {
-    @Autowired
-    UserRepository userRepository;
 
-    @Autowired
+@RestController
+@RequestMapping(path = "/user")
+public class UserC {
+    UserRepository userRepository;
     UserValidate userValidate;
 
-    @Path("/selectAll")
-    @GET
-    @Produces("text/html")
-    public ResponseEntity<List<User>> getAllAccount() {
-        return ResponseEntity.ok().body(userRepository.findAll());
+    @Autowired
+    public UserC(UserRepository userRepository, UserValidate userValidate) {
+        this.userRepository = userRepository;
+        this.userValidate = userValidate;
     }
 
 
-    @Path("/add")
-    @GET
-    @Produces(Phrases.text_html)
-    public String addUser(@QueryParam("name") String name, @QueryParam("phone") String phone) {
+    @GetMapping(path = "/findAll")
+    public List<User> getAllAccount() {
+        return userRepository.findAll();
+    }
+
+
+    @GetMapping(path = "/addUser")
+    public String addUser(@RequestParam("name") String name, @RequestParam("phone") String phone) {
         User user = new User(null, name, phone, null, null);
-        String validateOfUser = userValidate.userValidation(user);
-        if (!validateOfUser.equals("success")) {
-            return validateOfUser;
+        String userValidation = userValidate.userValidation(user);
+        Gson gson = new Gson();
+        gson.toJson(user);
+        if (userValidation.equals("Successfully")) {
+            userRepository.save(user);
+            return gson.toJson(user);
+
+        } else {
+            return userValidation;
         }
+    }
+
+    @PostMapping(path = "/addUser/body")
+    public User addUserByBody(@RequestBody User user) {
         userRepository.save(user);
-        return "doroste";
+        return user;
     }
 
 }

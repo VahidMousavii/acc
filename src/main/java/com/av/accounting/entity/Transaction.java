@@ -1,5 +1,6 @@
 package com.av.accounting.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,11 @@ public class Transaction {
     private Long transactionID;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "USER_ID")
+    @JsonIgnore
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ACCOUNT_ID")
+    @JsonIgnore
     private Account account;
     private BigDecimal price;
     private Date createDate;

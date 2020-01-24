@@ -6,55 +6,55 @@ import com.av.accounting.repositories.AccountRepository;
 import com.av.accounting.validation.AccountValidate;
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.av.accounting.validation.AccountValidateimpl;
 import com.av.accounting.validation.Phrases;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import java.sql.Date;
 import java.util.List;
 
-@Path("/user_accounting")
+@RestController
+@RequestMapping("/user_account")
 public class AccountC {
-
-    @Autowired
-    AccountRepository accountRepository;
-
     @Autowired
     AccountValidate accountValidate;
+    private AccountRepository accountRepository;
 
-
-    @Path("/selectAll")
-    @GET
-    @Produces(Phrases.text_html)
-    public String getAllAccount() {
-        List<com.av.accounting.entity.Account> accounts = accountRepository.findAll();
-        Gson gson = new Gson();
-        String jj = gson.toJson(accounts);
-        return jj;
+    @Autowired
+    public AccountC(AccountRepository accountRepository) {
+        this.accountRepository = accountRepository;
     }
 
 
-    public String addAccount(@NotNull @QueryParam("cardNumber") String cardNumber, @NotNull @QueryParam("CVV2") String CVV2, @NotNull @QueryParam("expiryDate") String exp, @QueryParam("createDate") String createDate) {
-        com.av.accounting.entity.Account account = new com.av.accounting.entity.Account();
-        String checkAccount = accountValidate.checkAccount(account);
-        if (!checkAccount.equals(Phrases.success)) {
-            return checkAccount;
-        }
+    @GetMapping(path = "/findAll")
+    public List<Account> findAll() {
+        return accountRepository.findAll();
+    }
 
-        accountRepository.save(account);
-        return "Successfully";
+    @GetMapping(path = "/addAccount")
+    public String addAccount(@RequestParam("cardNumber") String cardNumber, @RequestParam("CVV2") String CVV2,
+                             @RequestParam("expDate") String exp, @RequestParam("createDate") String createDate) {
+
+        Account account = new Account();
+        account.setCardNumber(cardNumber);
+        account.setCVV2(CVV2);
+        account.setExpiryDate(exp);
+       String accvalidate = accountValidate.checkAccount(account);
+        if (accvalidate.equals("Successfully")){
+            accountRepository.save(account);
+            Gson gson = new Gson();
+            String khuruji = gson.toJson(account);
+            return khuruji;
+        } else { return accvalidate; }
 
     }
 
-    public String allAccountByUser(@QueryParam("User_ID") Long userID) {
+    @GetMapping(path = "/allByUser")
+    public String allAccountByUser(@RequestParam("User_ID") Long userID) {
         User user = new User();
         user.setID(userID);
 
         accountRepository.findAllByUser(user);
-
 
 
         return "Successfully";
